@@ -1,47 +1,92 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>PHP Learning</title>
+    <title>Checking Variable Data Types</title>
 </head>
 <body>
-<h2>Simple Calculator</h2>
-<form method="POST">
-    <input type="number" name="num1" placeholder="First Number" required><br>
-    <select name="operation" id="">
-        <option value="add">Add</option>
-        <option value="subtract">Subtract</option>
-        <option value="multiply">Multiply</option>
-        <option value="divide">Divide</option>
-    </select><br>
-    <input type="number" name="num2" placeholder="Second Number" required>
-    <button type="submit">Calculate</button>
+<h2>Sum</h2>
+
+<form method="post">
+    <input type="number" step="any" name="num1" placeholder="Input First number" required>
+    <input type="number" step="any" name ="num2" placeholder="Input Second Number" required>
+    <input type="submit" name="submit" value="Submit">
 </form>
+
+
+
+
+</html>-->
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $num1 = $_POST['num1'];
-    $operation = $_POST['operation'];
-    $num2 = $_POST['num2'];
-   if ($operation == 'add'){
-      $price = $num1 + $num2;
-   }elseif ($operation == 'subtract'){
-      $price = $num1 - $num2 ;
-   }elseif ($operation == 'multiply'){
-      $price = $num1 * $num2 ;
-   }elseif ($operation == 'divide'){
-        if ($num2 != 0) {
-            $price = $num1 / $num2 ;
-        } else {
-            $price = "Error: Division by zero";
+$result = '';
+$error  = '';
+
+if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+    $num1 = $_POST['num1'] ?? '';
+    $num2 = $_POST['num2'] ?? '';
+    $op   = $_POST['operation'] ?? '';
+
+    // Validate
+    if ( ! is_numeric( $num1 ) || ! is_numeric( $num2 ) ) {
+        $error = 'Please enter valid numbers.';
+    } else {
+        $num1 = (float) $num1;
+        $num2 = (float) $num2;
+
+        switch ( $op ) {
+            case 'add':      $result = $num1 + $num2; break;
+            case 'subtract': $result = $num1 - $num2; break;
+            case 'multiply': $result = $num1 * $num2; break;
+            case 'divide':
+                if ( $num2 == 0 ) {
+                    $error = 'Cannot divide by zero.';
+                } else {
+                    $result = $num1 / $num2;
+                }
+                break;
+            default:
+                $error = 'Please choose an operation.';
         }
-   }
+    }
 }
-
-//unset($price);
-echo $price;
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP Calculator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 400px; margin: 50px auto; }
+        input, select, button { padding: 8px; margin: 5px 0; width: 100%; }
+        .result { background: #eef; padding: 10px; margin-top: 15px; }
+        .error  { background: #fee; padding: 10px; margin-top: 15px; color: #900; }
+    </style>
+</head>
+<body>
+    <h1>Simple Calculator</h1>
 
+    <form method="post">
+        <input type="text" name="num1" placeholder="First number"
+               value="<?php echo htmlspecialchars( $_POST['num1'] ?? '' ); ?>">
 
+        <select name="operation">
+            <option value="add">+</option>
+            <option value="subtract">−</option>
+            <option value="multiply">×</option>
+            <option value="divide">÷</option>
+        </select>
+
+        <input type="text" name="num2" placeholder="Second number"
+               value="<?php echo htmlspecialchars( $_POST['num2'] ?? '' ); ?>">
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    <?php if ( $error ) : ?>
+        <div class="error"><?php echo htmlspecialchars( $error ); ?></div>
+    <?php elseif ( $result !== '' ) : ?>
+        <div class="result">Result: <strong><?php echo htmlspecialchars( $result ); ?></strong></div>
+    <?php endif; ?>
+</body>
 </html>
